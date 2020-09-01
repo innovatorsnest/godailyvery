@@ -1,0 +1,32 @@
+@import '../../../../theme/variables.scss';
+
+.sidenav-container {
+  height: 100%;
+}
+
+
+.mat-toolbar {
+  background-color: $theme-dark;
+}
+
+.sidenav {
+  width: 200px;
+  background-color: $theme
+}
+
+.sidenav .mat-toolbar {
+  background: inherit;
+}
+
+.sidenav--content {
+    background-color: #ffffffa8;
+}
+
+.mat-toolbar.mat-primary {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+
+

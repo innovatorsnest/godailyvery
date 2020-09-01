@@ -1,0 +1,17 @@
+.input {
+
+
+    &_field {
+        margin-left: 20px;
+        margin-right: 20px;
+    }
+
+
+    &_field--text {
+        width: 80%;
+        --placeholder-color: var(--ion-color-medium);
+    }
+
+}
+
+

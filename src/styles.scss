@@ -1,1 +1,47 @@
 /* You can add global styles to this file, and also import other style files */
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+
+
+
+// variables for app
+@import './theme/variables.scss';
+@import "./theme/styles/abstracts/mixins";
+@import "./theme/styles/abstracts/partials";
+
+// base
+@import "./theme/styles/base/typography";
+@import "./theme/styles/base/base";
+@import "./theme/styles/base/animations";
+@import "./theme/styles/base/utilities";
+
+
+// abstracts
+@import "./theme/styles/abstracts/functions";
+// @import "./theme/styles/abstracts/external";
+
+
+// components
+@import "./theme/styles/components/spinner";
+// @import "./theme/styles/components/divider";
+// @import "./theme/styles/components/card";
+@import "./theme/styles/components/button";
+// @import "./theme/styles/components/dropdown";
+// @import "./theme/styles/components/chip";
+// @import "./theme/styles/components/modal";
+// @import "./theme/styles/components/modal";/
+// @import "./theme/styles/components/input";
+// @import "./theme/styles/components/search";
+
+
+
+
+
+
+
+
+
+
+
