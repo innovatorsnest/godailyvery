@@ -13,12 +13,14 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { LayoutModule } from '@angular/cdk/layout';
 import { MaterialModule } from './helper/material/material.module';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { AddComponent } from './modals/add/add.component';
-
+import { AngularFireDatabaseModule } from '@angular/fire/database';
+import { AngularFireModule } from '@angular/fire';
+import {environment} from './../environments/environment';
 
 
 @NgModule({
@@ -35,6 +37,10 @@ import { AddComponent } from './modals/add/add.component';
     LayoutModule,
     MaterialModule,
     FormsModule,
+    ReactiveFormsModule,
+    AngularFireDatabaseModule,
+    AngularFireModule.initializeApp(environment.FIREBASE_CONFIG)
+
 
   ],
   entryComponents: [AddComponent],

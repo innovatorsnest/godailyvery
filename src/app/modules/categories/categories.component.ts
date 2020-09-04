@@ -23,8 +23,9 @@ export class CategoriesComponent implements OnInit {
     const payload = {
       type: 'add',
       data: []
-    }
-    this.modalService.openDialog(payload, AddComponent,(response) => {
+    };
+
+    this.modalService.addCategory(payload, AddComponent,(response) => {
       console.log('response from the add response', response);
     });
   }
