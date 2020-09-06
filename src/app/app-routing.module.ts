@@ -7,9 +7,6 @@ const routes: Routes = [
   {
     path: 'categories',
     component: CategoriesComponent
-    // loadChildren: () => import('./modules/categories/categories.module').then(module => {
-    //   module.CategoriesModule
-    // })
   }
 ];
 

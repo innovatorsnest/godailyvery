@@ -13,8 +13,8 @@ export class ModalService {
 
   openDialog(data, component, callback) {
     const dialogRef = this.dialog.open(component, {
-      width: '500px',
-      height: '700px',
+      width: '400px',
+      height: '400px',
       data: data
     });
 
