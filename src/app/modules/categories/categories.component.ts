@@ -1,8 +1,12 @@
+import { ErrorHandlingService } from './../../services/req-handling.service';
+import { UploadService } from './../../services/upload.service';
 import { DataService } from './../../services/data.service';
 import { ModalService } from './../../services/modal.service';
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { AddComponent } from 'src/app/modals/add/add.component';
+import { AngularFireStorage } from '@angular/fire/storage';
+
 
 @Component({
   selector: 'app-categories',
@@ -10,12 +14,14 @@ import { AddComponent } from 'src/app/modals/add/add.component';
   styleUrls: ['./categories.component.scss']
 })
 export class CategoriesComponent implements OnInit {
-  categories: unknown[];
+  categories :any;
 
   constructor(
     private modalService: ModalService,
     private dataService: DataService,
-
+    private storage: AngularFireStorage,
+    private uploadService: UploadService,
+    private handler: ErrorHandlingService,
   ) {
 
   }
@@ -48,6 +54,7 @@ export class CategoriesComponent implements OnInit {
 
 
   operation(type, item) {
+    console.log(`item operation type ${type} and item ${item}`)
     if (type === 'edit') {
       const payload = {
         type: 'edit',
@@ -58,12 +65,16 @@ export class CategoriesComponent implements OnInit {
     }
 
     if (type === 'delete') {
-      this.dataService.deleteItem(item._id, 'categories')
-        .then((response) => {
-          console.log('%c response while removing item', 'color: yellow', response);
-        }, (error) => {
-          console.log('%c error while removing item', 'color: yellow', error);
-        });
+
+      this.dataService.deleteImage(item.imageUrl)
+      .then((response) => {
+        this.handler.reqSuccess(response, 'delete image');
+        this.dataService.deleteItem(item._id, 'categories');
+
+      })
+      .catch((error) => {
+        this.handler.reqError(error, 'delete image');
+      })
     }
   }
 

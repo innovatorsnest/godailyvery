@@ -1,9 +1,13 @@
+import { ErrorHandlingService } from './../../services/req-handling.service';
+import { UploadService } from './../../services/upload.service';
 import { DataService } from './../../services/data.service';
 
 import { FormControl, FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
+import { AngularFireStorage } from '@angular/fire/storage';
+
 
 
 /** @title Input with a custom ErrorStateMatcher */
@@ -15,12 +19,18 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 export class AddComponent implements OnInit {
 
   categoryForm: FormGroup
+  categoryName: any;
+  file: any;
 
   constructor(
     public dialogRef: MatDialogRef<AddComponent>,
     @Inject(MAT_DIALOG_DATA) public data,
     private formBuilder: FormBuilder,
     public dataService: DataService,
+    public storage: AngularFireStorage,
+    public upload: UploadService,
+    public handler: ErrorHandlingService,
+
   ) {
 
     console.log('%c data inside the model', 'color: yellow', this.data)
@@ -56,36 +66,78 @@ export class AddComponent implements OnInit {
 
 
   }
-  addCategory(form, values) {
+  addCategory(imageUrl, name) {
+
+    this.categoryName = name;
     const payload = {
-      name: values.name
+      name: name,
+      imageUrl: imageUrl
     };
 
     if (this.data.type === 'add') {
-      console.log('form values', values);
+      console.log('form values', name);
 
 
-      this.dataService.addItem(payload,'categories')
+      this.dataService.addItem(payload, 'categories')
         .then((response) => {
-          console.log('%c response of the add category', 'color: yellow', response);
+          this.handler.reqSuccess(response, 'add category');
           if (response["key"]) {
             this.dataService.addkey(response["key"], 'categories');
             this.dialogRef.close(true);
           }
         }).catch((error) => {
-          console.log('%c error of the add category', 'color: yellow', error);
+
+          this.handler.reqError(error, 'add category');
+
         });
     }
 
     if (this.data.type === 'edit') {
       this.dataService.updateItem(payload, 'categories', this.data.data._id)
-      .then((response) => {
-        console.log('%c response of the update category', 'color: yellow', response);
-        this.dialogRef.close(true);
-      }).catch((error) => {
-        console.log('%c error of the add category', 'color: yellow', error);
-      });
+        .then((response) => {
+
+          this.handler.reqSuccess(response, 'update category');
+
+
+          this.dialogRef.close(true);
+        }).catch((error) => {
+          this.handler.reqError(error, 'update category');
+          console.log('%c error of the add category', 'color: yellow', error);
+        });
     }
+
+  }
+
+
+  save(form, values) {
+    console.log('category name', values.name);
+    this.upload.uploadFile(this.file, values.name, 'categories')
+      .then((response) => {
+
+        this.handler.reqSuccess(response, 'save');
+        if (response["state"] === "success") {
+          this.fileUrl(values.name);
+
+        }
+      }, error => {
+        this.handler.reqError(error, 'save image');
+        console.log('%c error while saving the image', 'color: yellow', error);
+      });
+
+  }
+
+  fileUrl(name) {
+    this.upload.getFileDownloadUrl('categories', name).subscribe((response) => {
+      this.handler.reqSuccess(response, 'getting file url');
+        this.addCategory(response,name);
+
+    }, error => {
+      this.handler.reqError(error, 'getting file url');
+    })
+  }
+
+  uploadFile(event) {
+    this.file = event.target.files[0];
 
   }
 

@@ -22,6 +22,7 @@ import { AddComponent } from './modals/add/add.component';
 import { AngularFireModule } from '@angular/fire';
 import { environment } from 'src/environments/environment';
 import { StoresComponent } from './modules/stores/stores.component';
+import { AngularFireStorageModule , BUCKET } from '@angular/fire/storage';
 
 const CONFIG = {
   apiKey: "AIzaSyCLqTYsblJGrCy88zcwMEgqo0gH2ipk2BI",
@@ -51,11 +52,14 @@ const CONFIG = {
     FormsModule,
     ReactiveFormsModule,
     AngularFireModule.initializeApp(CONFIG),
+    AngularFireStorageModule,
     AngularFireDatabaseModule,
 
   ],
   entryComponents: [AddComponent],
-  providers: [],
+  providers: [
+    { provide: BUCKET, useValue: 'gs://dailydelivery-38619.appspot.com' }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

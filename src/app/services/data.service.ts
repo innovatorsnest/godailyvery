@@ -1,5 +1,7 @@
+import { UploadService } from './upload.service';
 import { Injectable } from '@angular/core';
 import { AngularFireDatabase } from '@angular/fire/database';
+
 
 @Injectable({
   providedIn: 'root'
@@ -9,12 +11,11 @@ export class DataService {
 
   db: any;
   constructor(
-    public database: AngularFireDatabase
-  ) {
+    public database: AngularFireDatabase,
+    public uploadService: UploadService,
 
+  ) {    }
 
-
-  }
 
 
 
@@ -37,7 +38,12 @@ export class DataService {
     });
   }
 
+  deleteImage(imageUrl) {
+    return this.uploadService.deleteFile(imageUrl);
+  }
+
   deleteItem(key,db) {
+
    return this.database.list(db).remove(key);
   }
 
