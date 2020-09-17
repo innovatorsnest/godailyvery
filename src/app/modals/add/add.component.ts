@@ -7,6 +7,7 @@ import { FormControl, FormGroup, FormBuilder, Validators } from '@angular/forms'
 import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 import { AngularFireStorage } from '@angular/fire/storage';
+import { timeStamp } from 'console';
 
 
 
@@ -19,9 +20,10 @@ import { AngularFireStorage } from '@angular/fire/storage';
 export class AddComponent implements OnInit {
 
   categoryForm: FormGroup
+  storeForm: FormGroup
   categoryName: any;
-  file: any;
-
+  storeName: any;
+  file :any;
   constructor(
     public dialogRef: MatDialogRef<AddComponent>,
     @Inject(MAT_DIALOG_DATA) public data,
@@ -46,9 +48,21 @@ export class AddComponent implements OnInit {
 
 
   buildForm() {
+    if (this.data.from === 'categories') {
+      this.buildCategoryForm();
+    }
+
+    if (this.data.from === 'stores') {
+      this.buildStoreForm();
+    }
+  }
+
+  buildCategoryForm() {
     if (this.data.type === 'add') {
+
       this.categoryForm = this.formBuilder.group({
-        name: ["", Validators.required]
+        name: ["", Validators.required],
+        file: ["", Validators.required],
       });
 
       console.log("model data", this.data);
@@ -56,89 +70,151 @@ export class AddComponent implements OnInit {
 
 
     if (this.data.type === 'edit') {
+      const data = this.data.data;
+
       this.categoryForm = this.formBuilder.group({
-        name: [this.data.data.name, Validators.required]
+        name: [data.name, Validators.required],
+        file: [''],
+
       });
 
       console.log("model data", this.data);
 
     }
-
-
   }
-  addCategory(imageUrl, name) {
 
-    this.categoryName = name;
+  buildStoreForm() {
+    if (this.data.type === 'add') {
+      this.storeForm = this.formBuilder.group({
+        name: ["", Validators.required],
+        address: ["", Validators.required],
+        city: ["", Validators.required],
+        state: ["", Validators.required],
+        owner: ["", Validators.required],
+        phone: ["", Validators.required]
+      });
+
+      console.log("model data", this.data);
+    }
+
+
+    if (this.data.type === 'edit') {
+      const data = this.data.data;
+      this.storeForm = this.formBuilder.group({
+        name: [data.name, Validators.required],
+        address: [ data.address.required],
+        state: [ data.state, Validators.required],
+        city: [ data.city, Validators.required],
+        owner: [data.owner, Validators.required],
+        phone: [data.phone, Validators.required]
+      });
+
+      console.log("model data", this.data);
+
+    }
+  }
+  add(imageUrl, name) {
+
     const payload = {
       name: name,
       imageUrl: imageUrl
     };
 
+    if(this.data.from === 'categories') {
+      this.categoryName = name;
+      this.saveDetails(payload,'categories');
+    }
+
+    if(this.data.from === 'stores') {
+      this.storeName = name;
+      this.saveDetails(payload,'stores');
+
+    }
+  }
+
+
+  saveDetails(payload,db) {
     if (this.data.type === 'add') {
       console.log('form values', name);
 
 
-      this.dataService.addItem(payload, 'categories')
+      this.dataService.addItem(payload, db)
         .then((response) => {
           this.handler.reqSuccess(response, 'add category');
           if (response["key"]) {
-            this.dataService.addkey(response["key"], 'categories');
+            this.dataService.addkey(response["key"], db);
             this.dialogRef.close(true);
           }
         }).catch((error) => {
 
-          this.handler.reqError(error, 'add category');
+          this.handler.reqError(error, db);
 
         });
     }
 
     if (this.data.type === 'edit') {
-      this.dataService.updateItem(payload, 'categories', this.data.data._id)
+      this.dataService.updateItem(payload, db, this.data.data._id)
         .then((response) => {
 
-          this.handler.reqSuccess(response, 'update category');
-
+          this.handler.reqSuccess(response, `update ${db}`);
 
           this.dialogRef.close(true);
         }).catch((error) => {
-          this.handler.reqError(error, 'update category');
-          console.log('%c error of the add category', 'color: yellow', error);
+          this.handler.reqError(error, `update ${db}`);
         });
     }
+  }
+
+  save(form, values, db) {
+    if(this.data.type === 'add') {
+
+      if(this.file.name !== '') {
+        this.uploadFileApi(values.name, db);
+      }
+
+    }
+
+    if(this.data.type === 'edit') {
+
+      if(this.file) {
+        this.uploadFileApi(values.name, db);
+      } else {
+        this.add(this.data.data.imageUrl, values.name);
+      }
+    }
+    console.log('name', values.name);
 
   }
 
-
-  save(form, values) {
-    console.log('category name', values.name);
-    this.upload.uploadFile(this.file, values.name, 'categories')
-      .then((response) => {
-
-        this.handler.reqSuccess(response, 'save');
-        if (response["state"] === "success") {
-          this.fileUrl(values.name);
-
-        }
-      }, error => {
-        this.handler.reqError(error, 'save image');
-        console.log('%c error while saving the image', 'color: yellow', error);
-      });
-
-  }
-
-  fileUrl(name) {
-    this.upload.getFileDownloadUrl('categories', name).subscribe((response) => {
+  fileUrl(name, db) {
+    this.upload.getFileDownloadUrl(db, name.toLowerCase()).subscribe((response) => {
       this.handler.reqSuccess(response, 'getting file url');
-        this.addCategory(response,name);
+      this.add(response, name);
 
     }, error => {
       this.handler.reqError(error, 'getting file url');
-    })
+    });
+  }
+
+  uploadFileApi(name,db) {
+    this.upload.uploadFile(this.file, name.toLowerCase(), 'categories')
+    .then((response) => {
+
+      this.handler.reqSuccess(response, 'save');
+      if (response["state"] === "success") {
+
+        this.fileUrl(name, db);
+      }
+    }, error => {
+      this.handler.reqError(error, 'save image');
+      console.log('%c error while saving the image', 'color: yellow', error);
+    });
   }
 
   uploadFile(event) {
     this.file = event.target.files[0];
 
+    console.log('uploading file', this.file);
   }
 
 

@@ -14,7 +14,7 @@ import { AngularFireStorage } from '@angular/fire/storage';
   styleUrls: ['./categories.component.scss']
 })
 export class CategoriesComponent implements OnInit {
-  categories :any;
+  categories: any;
 
   constructor(
     private modalService: ModalService,
@@ -45,7 +45,8 @@ export class CategoriesComponent implements OnInit {
   addNewCategory() {
     const payload = {
       type: 'add',
-      data: {}
+      from: 'categories',
+      data: {},
     };
 
     this.openModel(payload, AddComponent);
@@ -54,10 +55,12 @@ export class CategoriesComponent implements OnInit {
 
 
   operation(type, item) {
-    console.log(`item operation type ${type} and item ${item}`)
+    console.log('item operation type', type);
+    console.log('item operation', item);
     if (type === 'edit') {
       const payload = {
         type: 'edit',
+        from: 'categories',
         data: item
       };
 
@@ -67,14 +70,14 @@ export class CategoriesComponent implements OnInit {
     if (type === 'delete') {
 
       this.dataService.deleteImage(item.imageUrl)
-      .then((response) => {
-        this.handler.reqSuccess(response, 'delete image');
-        this.dataService.deleteItem(item._id, 'categories');
+        .then((response) => {
+          this.handler.reqSuccess(response, 'delete image');
+          this.dataService.deleteItem(item._id, 'categories');
 
-      })
-      .catch((error) => {
-        this.handler.reqError(error, 'delete image');
-      })
+        })
+        .catch((error) => {
+          this.handler.reqError(error, 'delete image');
+        })
     }
   }
 
