@@ -6,7 +6,7 @@
     <div class="form-group">
       <label for="name">Category Name</label>
       <input type="text" name="" formControlName="name" placeholder="Add Category Name" class="form-control" id="">
-      <input type="file" (change)="uploadFile($event)"  formControlName="file">
+      <input type="file" (change)="uploadFile($event)"  formControlName="imageUrl">
       <button class="btn btn-primary" [disabled]="!categoryForm.valid">Save</button>
     </div>
   </form>
@@ -21,9 +21,19 @@
   <form  [formGroup]="storeForm"  (ngSubmit)="save(storeForm,storeForm.value, 'stores')">
     <div class="form-group">
       <label for="name">Store Name</label>
-      <input type="text" name="" formControlName="name" placeholder="Add Store Name" class="form-control" id="">
-      <input type="file" (change)="uploadFile($event)">
-      <button class="btn btn-primary">Save</button>
+      <input type="text" name="" formControlName="name" placeholder="Enter full store name" class="form-control" id="">
+      <label for="name">Owner Name</label>
+      <input type="text" name="" formControlName="owner" placeholder="Enter full owner name" class="form-control" id="">
+      <label for="name">Mobile Number</label>
+      <input type="number" name="" formControlName="phone" placeholder="Enter Mobile" class="form-control" id="">
+      <label for="name">State</label>
+      <input type="text" name="" formControlName="city" placeholder="Your store state" class="form-control" id="">
+      <label for="name">City</label>
+      <input type="text" name="" formControlName="state" placeholder="Your store city" class="form-control" id="">
+      <label for="name">Address</label> <br>
+      <textarea height="300" width="300" formControlName="address" placeholder="Enter full address"></textarea> <br>
+      <input type="file" (change)="uploadFile($event)" formControlName="imageUrl">
+      <button class="btn btn-primary" [disabled]="!storeForm.valid">Save</button>
     </div>
   </form>
 </ng-container>

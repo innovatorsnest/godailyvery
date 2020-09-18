@@ -1,3 +1,4 @@
+import { ObservableService } from './../../services/observable.service';
 import { ErrorHandlingService } from './../../services/req-handling.service';
 import { UploadService } from './../../services/upload.service';
 import { DataService } from './../../services/data.service';
@@ -15,7 +16,7 @@ import { AngularFireStorage } from '@angular/fire/storage';
 })
 export class StoresComponent implements OnInit {
 
-  stores :any;
+  stores: any;
 
   constructor(
     private modalService: ModalService,
@@ -23,6 +24,7 @@ export class StoresComponent implements OnInit {
     private storage: AngularFireStorage,
     private uploadService: UploadService,
     private handler: ErrorHandlingService,
+    private observable: ObservableService,
   ) {
 
   }
@@ -35,11 +37,13 @@ export class StoresComponent implements OnInit {
 
 
   getAllStores() {
+    this.observable.updateSpinnerStatus(true);
     this.dataService.getItems('stores').subscribe((response) => {
-      this.handler.reqSuccess(response,'getting all the stores');
+      this.handler.reqSuccess(response, 'getting all the stores');
       this.stores = response;
+      this.observable.updateSpinnerStatus(false);
     }, error => {
-      this.handler.reqError(error,'getting all the stores');
+      this.handler.reqError(error, 'getting all the stores');
     });
   }
 
@@ -59,6 +63,7 @@ export class StoresComponent implements OnInit {
     if (type === 'edit') {
       const payload = {
         type: 'edit',
+        from: 'stores',
         data: item
       };
 
@@ -68,19 +73,19 @@ export class StoresComponent implements OnInit {
     if (type === 'delete') {
 
       this.dataService.deleteImage(item.imageUrl)
-      .then((response) => {
-        this.handler.reqSuccess(response, 'delete image');
-        this.dataService.deleteItem(item._id, 'stores');
+        .then((response) => {
+          this.handler.reqSuccess(response, 'delete image');
+          this.dataService.deleteItem(item._id, 'stores');
 
-      })
-      .catch((error) => {
-        this.handler.reqError(error, 'delete image');
-      })
+        })
+        .catch((error) => {
+          this.handler.reqError(error, 'delete image');
+        })
     }
   }
 
   openModel(payload, component) {
-    this.modalService.openDialog(payload, component, (callback) => {
+    this.modalService.openDialog(payload, component, { height: '500', width: '400' }, (callback) => {
       console.log('response from the add response', callback);
       if (callback === true) {
         this.getAllStores();

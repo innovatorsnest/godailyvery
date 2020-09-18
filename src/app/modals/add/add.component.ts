@@ -7,8 +7,6 @@ import { FormControl, FormGroup, FormBuilder, Validators } from '@angular/forms'
 import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 import { AngularFireStorage } from '@angular/fire/storage';
-import { timeStamp } from 'console';
-
 
 
 /** @title Input with a custom ErrorStateMatcher */
@@ -23,7 +21,7 @@ export class AddComponent implements OnInit {
   storeForm: FormGroup
   categoryName: any;
   storeName: any;
-  file :any;
+  file: any;
   constructor(
     public dialogRef: MatDialogRef<AddComponent>,
     @Inject(MAT_DIALOG_DATA) public data,
@@ -53,6 +51,7 @@ export class AddComponent implements OnInit {
     }
 
     if (this.data.from === 'stores') {
+      console.log('building store form');
       this.buildStoreForm();
     }
   }
@@ -62,7 +61,7 @@ export class AddComponent implements OnInit {
 
       this.categoryForm = this.formBuilder.group({
         name: ["", Validators.required],
-        file: ["", Validators.required],
+        imageUrl: ["", Validators.required],
       });
 
       console.log("model data", this.data);
@@ -74,8 +73,7 @@ export class AddComponent implements OnInit {
 
       this.categoryForm = this.formBuilder.group({
         name: [data.name, Validators.required],
-        file: [''],
-
+        imageUrl: [''],
       });
 
       console.log("model data", this.data);
@@ -87,11 +85,12 @@ export class AddComponent implements OnInit {
     if (this.data.type === 'add') {
       this.storeForm = this.formBuilder.group({
         name: ["", Validators.required],
+        imageUrl: ["", Validators.required],
         address: ["", Validators.required],
         city: ["", Validators.required],
         state: ["", Validators.required],
         owner: ["", Validators.required],
-        phone: ["", Validators.required]
+        phone: ["", Validators.required],
       });
 
       console.log("model data", this.data);
@@ -102,9 +101,10 @@ export class AddComponent implements OnInit {
       const data = this.data.data;
       this.storeForm = this.formBuilder.group({
         name: [data.name, Validators.required],
-        address: [ data.address.required],
-        state: [ data.state, Validators.required],
-        city: [ data.city, Validators.required],
+        address: [data.address, Validators.required],
+        imageUrl: [""],
+        state: [data.state, Validators.required],
+        city: [data.city, Validators.required],
         owner: [data.owner, Validators.required],
         phone: [data.phone, Validators.required]
       });
@@ -113,27 +113,36 @@ export class AddComponent implements OnInit {
 
     }
   }
-  add(imageUrl, name) {
+  add(data) {
 
-    const payload = {
-      name: name,
-      imageUrl: imageUrl
-    };
+    if (this.data.from === 'categories') {
+      const payload = {
+        name: data.name,
+        imageUrl: data.imageUrl
+      };
 
-    if(this.data.from === 'categories') {
-      this.categoryName = name;
-      this.saveDetails(payload,'categories');
+
+      this.categoryName = data.name;
+      this.saveDetails(payload, 'categories');
     }
 
-    if(this.data.from === 'stores') {
-      this.storeName = name;
-      this.saveDetails(payload,'stores');
-
+    if (this.data.from === 'stores') {
+      const payload = {
+        name: data.name,
+        imageUrl: data.imageUrl,
+        owner: data.owner,
+        address: data.address,
+        phone: data.phone,
+        state: data.state,
+        city: data.city
+      };
+      this.storeName = data.name;
+      this.saveDetails(payload, 'stores');
     }
   }
 
 
-  saveDetails(payload,db) {
+  saveDetails(payload, db) {
     if (this.data.type === 'add') {
       console.log('form values', name);
 
@@ -153,7 +162,22 @@ export class AddComponent implements OnInit {
     }
 
     if (this.data.type === 'edit') {
-      this.dataService.updateItem(payload, db, this.data.data._id)
+
+      console.log('payload before sending it to the edit ', payload);
+      console.log('id to update the picture  ', this.data.data);
+
+      const newPayload = {
+        data: payload,
+        _id: this.data.data._id
+      };
+
+      console.log('new payload data  ', newPayload);
+      console.log('data previous  ', this.data.data);
+
+
+
+
+      this.dataService.updateItem(newPayload.data, db, newPayload._id)
         .then((response) => {
 
           this.handler.reqSuccess(response, `update ${db}`);
@@ -162,53 +186,76 @@ export class AddComponent implements OnInit {
         }).catch((error) => {
           this.handler.reqError(error, `update ${db}`);
         });
+
+
+
+
+
+
     }
   }
 
   save(form, values, db) {
-    if(this.data.type === 'add') {
+    console.log('values', values);
+    if (this.data.type === 'add') {
 
-      if(this.file.name !== '') {
-        this.uploadFileApi(values.name, db);
+      if (this.file.name !== '') {
+        this.uploadFileApi(values, db);
       }
 
     }
 
-    if(this.data.type === 'edit') {
+    if (this.data.type === 'edit') {
 
-      if(this.file) {
-        this.uploadFileApi(values.name, db);
+      const previousData = { ...this.data.data };
+
+      if (this.file) {
+        this.dataService.deleteImage(this.data.data.imageUrl)
+          .then((res) => {
+            this.uploadFileApi(values, db);
+          })
+          .catch((error) => {
+            this.handler.reqError(error, 'delete image');
+          })
       } else {
-        this.add(this.data.data.imageUrl, values.name);
+        values.imageUrl = this.data.data.imageUrl;
+        this.add(values);
       }
     }
-    console.log('name', values.name);
+
 
   }
 
-  fileUrl(name, db) {
-    this.upload.getFileDownloadUrl(db, name.toLowerCase()).subscribe((response) => {
+  fileUrl(values, db) {
+    console.log('getting the file url of the new data', values);
+    this.upload.getFileDownloadUrl(db, values.name.toLowerCase()).subscribe((response) => {
       this.handler.reqSuccess(response, 'getting file url');
-      this.add(response, name);
+      console.log('previous file url values', values);
+      if (response) {
+        values.imageUrl = response;
+        console.log('updating the new file url', values);
+        this.add(values);
+      }
 
     }, error => {
       this.handler.reqError(error, 'getting file url');
     });
   }
 
-  uploadFileApi(name,db) {
-    this.upload.uploadFile(this.file, name.toLowerCase(), 'categories')
-    .then((response) => {
+  uploadFileApi(values, db) {
 
-      this.handler.reqSuccess(response, 'save');
-      if (response["state"] === "success") {
+    this.upload.uploadFile(this.file, values.name.toLowerCase(), db)
+      .then((response) => {
 
-        this.fileUrl(name, db);
-      }
-    }, error => {
-      this.handler.reqError(error, 'save image');
-      console.log('%c error while saving the image', 'color: yellow', error);
-    });
+        this.handler.reqSuccess(response, 'save');
+        if (response["state"] === "success") {
+
+          this.fileUrl(values, db);
+        }
+      }, error => {
+        this.handler.reqError(error, 'save image');
+        console.log('%c error while saving the image', 'color: yellow', error);
+      });
   }
 
   uploadFile(event) {

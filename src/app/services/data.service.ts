@@ -33,9 +33,7 @@ export class DataService {
   }
 
   updateItem(payload,db,key) {
-    return this.database.list(db).update(key, {
-      name: payload.name
-    });
+    return this.database.list(db).update(key, payload);
   }
 
   deleteImage(imageUrl) {
