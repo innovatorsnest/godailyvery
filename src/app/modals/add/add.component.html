@@ -2,11 +2,11 @@
   <h1 mat-dialog-title *ngIf="this.data.type === 'add'">Add Category</h1>
   <h1 mat-dialog-title *ngIf="this.data.type === 'edit'">Edit Category</h1>
 
-  <form  [formGroup]="categoryForm"  (ngSubmit)="save(categoryForm,categoryForm.value,'categories')">
+  <form [formGroup]="categoryForm" (ngSubmit)="save(categoryForm,categoryForm.value,'categories')">
     <div class="form-group">
       <label for="name">Category Name</label>
       <input type="text" name="" formControlName="name" placeholder="Add Category Name" class="form-control" id="">
-      <input type="file" (change)="uploadFile($event)"  formControlName="imageUrl">
+      <input type="file" (change)="uploadFile($event)" formControlName="imageUrl">
       <button class="btn btn-primary" [disabled]="!categoryForm.valid">Save</button>
     </div>
   </form>
@@ -18,10 +18,17 @@
   <h1 mat-dialog-title *ngIf="this.data.type === 'add'">Add Stores</h1>
   <h1 mat-dialog-title *ngIf="this.data.type === 'edit'">Edit Stores</h1>
 
-  <form  [formGroup]="storeForm"  (ngSubmit)="save(storeForm,storeForm.value, 'stores')">
+
+  <form [formGroup]="storeForm" (ngSubmit)="save(storeForm,storeForm.value, 'stores')">
     <div class="form-group">
       <label for="name">Store Name</label>
       <input type="text" name="" formControlName="name" placeholder="Enter full store name" class="form-control" id="">
+      <label for="name">Choose Category</label>
+      {{category}}
+      <select class="form-control" formControlName="category" id="category" >
+        <option [ngValue]="null" >Choose Category</option>
+        <option [ngValue]="category['name']" *ngFor="let category of categories">{{category['name']}}</option>
+      </select>
       <label for="name">Owner Name</label>
       <input type="text" name="" formControlName="owner" placeholder="Enter full owner name" class="form-control" id="">
       <label for="name">Mobile Number</label>

@@ -1,3 +1,4 @@
+import { ObservableService } from './../../services/observable.service';
 import { ErrorHandlingService } from './../../services/req-handling.service';
 import { UploadService } from './../../services/upload.service';
 import { DataService } from './../../services/data.service';
@@ -19,9 +20,10 @@ export class AddComponent implements OnInit {
 
   categoryForm: FormGroup
   storeForm: FormGroup
-  categoryName: any;
+  category :any;
   storeName: any;
   file: any;
+  categories :any[];
   constructor(
     public dialogRef: MatDialogRef<AddComponent>,
     @Inject(MAT_DIALOG_DATA) public data,
@@ -30,19 +32,33 @@ export class AddComponent implements OnInit {
     public storage: AngularFireStorage,
     public upload: UploadService,
     public handler: ErrorHandlingService,
+    public observable: ObservableService,
 
   ) {
 
     console.log('%c data inside the model', 'color: yellow', this.data)
-
     this.buildForm();
+
   }
 
 
   ngOnInit() {
 
+    this.getAllCategories();
 
   }
+
+  getAllCategories() {
+    this.observable.updateSpinnerStatus(true);
+    this.dataService.getItems('categories').subscribe((response) => {
+      console.log('%c response from getting the data service', 'color: yellow', response);
+      this.categories = response;
+      this.observable.updateSpinnerStatus(false);
+    }, error => {
+      console.log('%c error while getting all the categories', 'color: yellow', error);
+    });
+  }
+
 
 
   buildForm() {
@@ -64,12 +80,15 @@ export class AddComponent implements OnInit {
         imageUrl: ["", Validators.required],
       });
 
+
+
       console.log("model data", this.data);
     }
 
 
     if (this.data.type === 'edit') {
       const data = this.data.data;
+
 
       this.categoryForm = this.formBuilder.group({
         name: [data.name, Validators.required],
@@ -82,32 +101,43 @@ export class AddComponent implements OnInit {
   }
 
   buildStoreForm() {
+    this.category = null;
     if (this.data.type === 'add') {
+
       this.storeForm = this.formBuilder.group({
         name: ["", Validators.required],
         imageUrl: ["", Validators.required],
-        address: ["", Validators.required],
+      address: ["", Validators.required],
         city: ["", Validators.required],
+        category: [null, Validators.required],
         state: ["", Validators.required],
         owner: ["", Validators.required],
         phone: ["", Validators.required],
       });
+
+
 
       console.log("model data", this.data);
     }
 
 
     if (this.data.type === 'edit') {
+
       const data = this.data.data;
+
+
       this.storeForm = this.formBuilder.group({
         name: [data.name, Validators.required],
         address: [data.address, Validators.required],
         imageUrl: [""],
         state: [data.state, Validators.required],
+        category: [null, Validators.required],
         city: [data.city, Validators.required],
         owner: [data.owner, Validators.required],
         phone: [data.phone, Validators.required]
       });
+
+
 
       console.log("model data", this.data);
 
@@ -121,8 +151,6 @@ export class AddComponent implements OnInit {
         imageUrl: data.imageUrl
       };
 
-
-      this.categoryName = data.name;
       this.saveDetails(payload, 'categories');
     }
 
@@ -133,12 +161,27 @@ export class AddComponent implements OnInit {
         owner: data.owner,
         address: data.address,
         phone: data.phone,
+        categoryId: this.findCategoryId(data.category),
         state: data.state,
         city: data.city
       };
       this.storeName = data.name;
       this.saveDetails(payload, 'stores');
     }
+  }
+
+  findCategoryId(category) {
+
+    let index = this.categories.findIndex((item,index) => {
+      if(item.name === category) {
+        console.log('found item', item.name);
+        console.log('found index', index);
+        return index;
+      }
+    });
+
+
+    return this.categories[index]._id;
   }
 
 
