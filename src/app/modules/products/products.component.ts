@@ -3,18 +3,22 @@ import { ErrorHandlingService } from './../../services/req-handling.service';
 import { UploadService } from './../../services/upload.service';
 import { DataService } from './../../services/data.service';
 import { ModalService } from './../../services/modal.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { AddComponent } from 'src/app/modals/add/add.component';
 import { AngularFireStorage } from '@angular/fire/storage';
 
+
+
 @Component({
-  selector: 'app-categories',
-  templateUrl: './categories.component.html',
-  styleUrls: ['./categories.component.scss']
+  selector: 'app-products',
+  templateUrl: './products.component.html',
+  styleUrls: ['./products.component.scss']
 })
-export class CategoriesComponent implements OnInit {
-  categories: any;
+export class ProductsComponent implements OnInit {
+  products: any;
+
+  @Input() key;
 
   constructor(
     private modalService: ModalService,
@@ -24,33 +28,46 @@ export class CategoriesComponent implements OnInit {
     private handler: ErrorHandlingService,
     private observable: ObservableService,
   ) {
-    this.getAllCategories();
   }
 
-  allCategories: any[];
+  allProducts: any[];
 
   ngOnInit() {
-
+    this.getAllProductsOfStores();
   }
 
 
-  getAllCategories() {
+  getAllProductsOfStores() {
     this.observable.updateSpinnerStatus(true);
-    this.dataService.getItems('categories').subscribe((response) => {
-      console.log('%c response from getting the data service', 'color: yellow', response);
-      this.categories = response;
-      this.observable.updateSpinnerStatus(false);
 
-    }, error => {
-      console.log('%c error while getting all the categories', 'color: yellow', error);
-    });
+    console.log('key', this.key);
+    this.dataService.getProductsOfStore('stores', this.key)
+      .subscribe((response) => {
+        console.log('%c response from getting the data service', 'color: yellow', response);
+        this.products = response[0]["products"];
+        this.observable.updateSpinnerStatus(false);
+
+      }, error => {
+        console.log('%c error while getting all the products', 'color: yellow', error);
+      });
+
+
+    // this.dataService.getItems('stores').subscribe((response) => {
+    //   console.log('%c response from getting the data service', 'color: yellow', response);
+    //   this.products = response;
+    //   this.observable.updateSpinnerStatus(false);
+
+    // }, error => {
+    //   console.log('%c error while getting all the products', 'color: yellow', error);
+    // });
   }
 
-  addNewCategory() {
+  addNewProduct() {
     const payload = {
       type: 'add',
-      from: 'categories',
-      data: {  },
+      from: 'products',
+      data: this.products,
+      key: this.key
     };
 
     this.openModel(payload, AddComponent);
@@ -62,13 +79,13 @@ export class CategoriesComponent implements OnInit {
     console.log('item operation', item);
     this.observable.updateSpinnerStatus(true);
 
-
     if (type === 'edit') {
-      item["categories"] = this.categories;
+      item["products"] = this.products;
       const payload = {
         type: 'edit',
-        from: 'categories',
-        data: item
+        from: 'products',
+        data: item,
+        key: this.key
       };
 
       this.openModel(payload, AddComponent);
@@ -78,7 +95,7 @@ export class CategoriesComponent implements OnInit {
       this.dataService.deleteImage(item.imageUrl)
         .then((response) => {
           this.handler.reqSuccess(response, 'delete image');
-          this.dataService.deleteItem(item._id, 'categories');
+          this.dataService.deleteItem(item._id, 'products');
 
         })
         .catch((error) => {
@@ -91,7 +108,7 @@ export class CategoriesComponent implements OnInit {
     this.modalService.openDialog(payload, component, { height: '400', width: '400' }, (callback) => {
       console.log('response from the add response', callback);
       if (callback === true) {
-        this.getAllCategories();
+        this.getAllProductsOfStores();
       }
     });
   }

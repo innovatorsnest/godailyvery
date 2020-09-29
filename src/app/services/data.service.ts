@@ -27,6 +27,22 @@ export class DataService {
   }
 
 
+  addItemToStore(payload,parentdb,key) {
+    return this.database.list(parentdb).update(key, {
+      products: payload
+    });
+  }
+
+
+  getProductsOfStore(db,key) {
+    const data =  this.database.list(db, ref => {
+      return ref.orderByKey().equalTo(key);
+    })
+
+    console.log('%c data of all the stores inside the category', 'color: yellow', data);
+    return data.valueChanges();
+  }
+
 
   getItems(db) {
     return this.database.list(db).valueChanges();

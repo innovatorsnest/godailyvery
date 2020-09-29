@@ -19,15 +19,15 @@
   <h1 mat-dialog-title *ngIf="this.data.type === 'edit'">Edit Stores</h1>
 
 
-  <form [formGroup]="storeForm" (ngSubmit)="save(storeForm,storeForm.value, 'stores')">
+  <form [formGroup]="storeForm" (ngSubmit)="save(storeForm,storeForm.value,'stores')">
     <div class="form-group">
       <label for="name">Store Name</label>
       <input type="text" name="" formControlName="name" placeholder="Enter full store name" class="form-control" id="">
       <label for="name">Choose Category</label>
       {{category}}
-      <select class="form-control" formControlName="category" id="category" >
-        <option [ngValue]="null" >Choose Category</option>
-        <option [ngValue]="category['name']" *ngFor="let category of categories">{{category['name']}}</option>
+      <select class="form-control" formControlName="category" id="category">
+        <option [ngValue]="null">Choose Category</option>
+        <option [ngValue]="category['name']" *ngFor="let category of data.data.categories">{{category['name']}}</option>
       </select>
       <label for="name">Owner Name</label>
       <input type="text" name="" formControlName="owner" placeholder="Enter full owner name" class="form-control" id="">
@@ -42,5 +42,25 @@
       <input type="file" (change)="uploadFile($event)" formControlName="imageUrl">
       <button class="btn btn-primary" [disabled]="!storeForm.valid">Save</button>
     </div>
+  </form>
+</ng-container>
+
+<ng-container *ngIf="data.from === 'products'">
+  <form [formGroup]="productForm" (ngSubmit)="save(productForm,productForm.value,'products')">
+    <label for="name">Product Name</label>
+    <input type="text" name="" formControlName="name" placeholder="Enter full product name" class="form-control" id="">
+    <label for="name">Price Name</label>
+    <input type="number" name="" formControlName="price" placeholder="Enter price" class="form-control" id="">
+    <label for="name">Type</label>
+    <select class="form-control" formControlName="type" id="type">
+      <option [ngValue]="null">Choose Type</option>
+      <option [ngValue]="'veg'">Veg</option>
+      <option [ngValue]="'non-veg'">Non Veg</option>
+      <option [ngValue]="'drinks'">Drinks</option>
+    </select>
+    <label for="name">Description</label>
+    <textarea height="300" width="300" formControlName="description" placeholder="Enter description"></textarea>
+    <input type="file" (change)="uploadFile($event)" formControlName="imageUrl">
+    <button class="btn btn-primary" [disabled]="!productForm.valid">Save</button>
   </form>
 </ng-container>

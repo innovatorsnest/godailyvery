@@ -5,13 +5,17 @@ mat-card {
   margin-right: 20px;
 }
 
-.categories {
+.items {
   padding-left: 20px;
   padding-right: 20px;
 }
 
 
-.category {
+.card {
+  cursor: pointer;
+}
+
+.items {
   &__title {
     padding-top: 10px;
     padding-bottom: 10px;

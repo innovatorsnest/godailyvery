@@ -1,12 +1,12 @@
 <div class="container">
   <div class="row">
     <div class="col-md-12">
-      <button mat-raised-button class="add--button" color="primary" (click)="addNewStore()">
+      <button mat-raised-button class="add--button" color="primary" (click)="addNewProduct()">
         <span class="material-icons">
           add_circle_outline
         </span>
 
-        Add new Store
+        Add new Product
       </button>
     </div>
   </div>
@@ -15,12 +15,12 @@
 
 
 <div class="row items">
-  <ng-container *ngFor="let store of stores; let index = index;">
-    <mat-card  (click)="goToStoresProducts(store)" class="card">
+  <ng-container *ngFor="let product of products; let index = index;">
+    <mat-card class="items-card">
       <div class="row">
         <div class="col-md-8">
           <p class="items__title">
-            {{store["name"]}}
+            {{product["name"]}}
           </p>
 
         </div>
@@ -29,11 +29,12 @@
             <mat-icon>more_vert</mat-icon>
           </button>
           <mat-menu #menu="matMenu">
-            <button mat-menu-item (click)="operation('edit', store)">
+            <button mat-menu-item (click)="operation('edit', product)">
               <mat-icon>create</mat-icon>
               <span>Edit</span>
             </button>
-            <button mat-menu-item (click)="operation('delete', store)">
+            <button mat-menu-item (click)="operation('delete', product
+            )">
               <mat-icon>delete</mat-icon>
               <span>Delete</span>
             </button>
@@ -41,13 +42,12 @@
           </mat-menu>
         </div>
       </div>
-
       <div class="img">
-        <img height="100" width="100" [src]="store.imageUrl" alt="">
+        <img height="100" width="100" [src]="product.imageUrl" alt="">
+
       </div>
 
     </mat-card>
-
 
 
   </ng-container>

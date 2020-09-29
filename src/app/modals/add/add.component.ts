@@ -1,4 +1,4 @@
-import { ObservableService } from './../../services/observable.service';
+// import { ObservableService } from './../../services/observable.service';
 import { ErrorHandlingService } from './../../services/req-handling.service';
 import { UploadService } from './../../services/upload.service';
 import { DataService } from './../../services/data.service';
@@ -8,22 +8,26 @@ import { FormControl, FormGroup, FormBuilder, Validators } from '@angular/forms'
 import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 import { AngularFireStorage } from '@angular/fire/storage';
+import { ObservableService } from 'src/app/services/observable.service';
 
 
 /** @title Input with a custom ErrorStateMatcher */
 @Component({
-  selector: "app-add",
-  templateUrl: "./add.component.html",
-  styleUrls: ["./add.component.scss"]
+  selector: 'app-add',
+  templateUrl: './add.component.html',
+  styleUrls: ['./add.component.scss']
 })
 export class AddComponent implements OnInit {
 
   categoryForm: FormGroup
   storeForm: FormGroup
-  category :any;
+  category: any;
   storeName: any;
   file: any;
-  categories :any[];
+  categories: any[];
+  categoryId: any;
+  categoryName: any;
+  productForm: FormGroup;
   constructor(
     public dialogRef: MatDialogRef<AddComponent>,
     @Inject(MAT_DIALOG_DATA) public data,
@@ -33,7 +37,6 @@ export class AddComponent implements OnInit {
     public upload: UploadService,
     public handler: ErrorHandlingService,
     public observable: ObservableService,
-
   ) {
 
     console.log('%c data inside the model', 'color: yellow', this.data)
@@ -43,25 +46,16 @@ export class AddComponent implements OnInit {
 
 
   ngOnInit() {
-
-    this.getAllCategories();
+    this.observable.updateSpinnerStatus(false);
 
   }
 
-  getAllCategories() {
-    this.observable.updateSpinnerStatus(true);
-    this.dataService.getItems('categories').subscribe((response) => {
-      console.log('%c response from getting the data service', 'color: yellow', response);
-      this.categories = response;
-      this.observable.updateSpinnerStatus(false);
-    }, error => {
-      console.log('%c error while getting all the categories', 'color: yellow', error);
-    });
-  }
+
 
 
 
   buildForm() {
+
     if (this.data.from === 'categories') {
       this.buildCategoryForm();
     }
@@ -70,34 +64,68 @@ export class AddComponent implements OnInit {
       console.log('building store form');
       this.buildStoreForm();
     }
+
+    if (this.data.from === 'products') {
+      console.log('building product form');
+      this.buildProductForm();
+    }
+  }
+
+  buildProductForm() {
+    if (this.data.type === 'add') {
+
+      this.productForm = this.formBuilder.group({
+        name: ['', Validators.required],
+        imageUrl: ['', Validators.required],
+        type: [null, Validators.required],
+        price: ['', Validators.required],
+        description: ['', Validators.required]
+      });
+
+      console.log('model data', this.data);
+    }
+
+    if (this.data.type === 'edit') {
+
+      console.log('data inside the edit product', this.data.data);
+
+      const data = this.data.data;
+
+      this.productForm = this.formBuilder.group({
+        name: [data.name, Validators.required],
+        imageUrl: [''],
+        type: [data.type, Validators.required],
+        price: [data.price, Validators.required],
+        description: [data.description, Validators.required]
+      });
+
+      console.log('model data', this.data);
+    }
+
   }
 
   buildCategoryForm() {
     if (this.data.type === 'add') {
 
       this.categoryForm = this.formBuilder.group({
-        name: ["", Validators.required],
-        imageUrl: ["", Validators.required],
+        name: ['', Validators.required],
+        imageUrl: ['', Validators.required],
       });
 
-
-
-      console.log("model data", this.data);
+      console.log('model data', this.data);
     }
-
 
     if (this.data.type === 'edit') {
       const data = this.data.data;
-
 
       this.categoryForm = this.formBuilder.group({
         name: [data.name, Validators.required],
         imageUrl: [''],
       });
 
-      console.log("model data", this.data);
-
+      console.log('model data', this.data);
     }
+
   }
 
   buildStoreForm() {
@@ -105,42 +133,39 @@ export class AddComponent implements OnInit {
     if (this.data.type === 'add') {
 
       this.storeForm = this.formBuilder.group({
-        name: ["", Validators.required],
-        imageUrl: ["", Validators.required],
-      address: ["", Validators.required],
-        city: ["", Validators.required],
+        name: ['', Validators.required],
+        imageUrl: ['', Validators.required],
+        address: ['', Validators.required],
+        city: ['', Validators.required],
         category: [null, Validators.required],
-        state: ["", Validators.required],
-        owner: ["", Validators.required],
-        phone: ["", Validators.required],
+        state: ['', Validators.required],
+        owner: ['', Validators.required],
+        phone: ['', Validators.required]
       });
 
-
-
-      console.log("model data", this.data);
+      console.log('model data', this.data);
     }
 
 
     if (this.data.type === 'edit') {
 
       const data = this.data.data;
+      this.findCategoryName(data.categoryId);
 
+      if (this.categoryName) {
+        this.storeForm = this.formBuilder.group({
+          name: [data.name, Validators.required],
+          address: [data.address, Validators.required],
+          imageUrl: [''],
+          category: [this.categoryName, Validators.required],
+          state: [data.state, Validators.required],
+          city: [data.city, Validators.required],
+          owner: [data.owner, Validators.required],
+          phone: [data.phone, Validators.required]
+        });
 
-      this.storeForm = this.formBuilder.group({
-        name: [data.name, Validators.required],
-        address: [data.address, Validators.required],
-        imageUrl: [""],
-        state: [data.state, Validators.required],
-        category: [null, Validators.required],
-        city: [data.city, Validators.required],
-        owner: [data.owner, Validators.required],
-        phone: [data.phone, Validators.required]
-      });
-
-
-
-      console.log("model data", this.data);
-
+        console.log('model data', this.data);
+      }
     }
   }
   add(data) {
@@ -155,57 +180,64 @@ export class AddComponent implements OnInit {
     }
 
     if (this.data.from === 'stores') {
+
+      console.log('%c payload of data inside the store', 'color: green', data);
+
+      this.findCategoryId(data.category);
+
+      if (this.categoryId) {
+        const payload = {
+          name: data.name,
+          imageUrl: data.imageUrl,
+          owner: data.owner,
+          address: data.address,
+          phone: data.phone,
+          categoryId: this.categoryId,
+          state: data.state,
+          city: data.city
+        };
+
+        this.storeName = data.name;
+        this.saveDetails(payload, 'stores');
+      }
+    }
+
+    if (this.data.from === 'products') {
+
       const payload = {
         name: data.name,
+        price: data.price,
+        description: data.description,
+        type: data.type,
         imageUrl: data.imageUrl,
-        owner: data.owner,
-        address: data.address,
-        phone: data.phone,
-        categoryId: this.findCategoryId(data.category),
-        state: data.state,
-        city: data.city
+        inStock: true
       };
-      this.storeName = data.name;
-      this.saveDetails(payload, 'stores');
+
+      this.saveProducts(payload, 'products');
+
     }
-  }
 
-  findCategoryId(category) {
-
-    let index = this.categories.findIndex((item,index) => {
-      if(item.name === category) {
-        console.log('found item', item.name);
-        console.log('found index', index);
-        return index;
-      }
-    });
-
-
-    return this.categories[index]._id;
   }
 
 
   saveDetails(payload, db) {
+
     if (this.data.type === 'add') {
       console.log('form values', name);
-
-
       this.dataService.addItem(payload, db)
         .then((response) => {
           this.handler.reqSuccess(response, 'add category');
-          if (response["key"]) {
-            this.dataService.addkey(response["key"], db);
+          if (response['key']) {
+            this.dataService.addkey(response['key'], db);
             this.dialogRef.close(true);
           }
-        }).catch((error) => {
-
+        })
+        .catch((error) => {
           this.handler.reqError(error, db);
-
         });
     }
 
     if (this.data.type === 'edit') {
-
       console.log('payload before sending it to the edit ', payload);
       console.log('id to update the picture  ', this.data.data);
 
@@ -218,34 +250,45 @@ export class AddComponent implements OnInit {
       console.log('data previous  ', this.data.data);
 
 
-
-
       this.dataService.updateItem(newPayload.data, db, newPayload._id)
         .then((response) => {
-
           this.handler.reqSuccess(response, `update ${db}`);
-
+          // this.observable.updateSpinnerStatus(false);
           this.dialogRef.close(true);
         }).catch((error) => {
           this.handler.reqError(error, `update ${db}`);
         });
-
-
-
-
-
-
     }
   }
 
-  save(form, values, db) {
-    console.log('values', values);
+  saveProducts(payload, db) {
     if (this.data.type === 'add') {
 
+      this.data.data.push(payload);
+      this.dataService.addItemToStore(this.data.data, 'stores', this.data.key)
+      .then((response) => {
+              this.dialogRef.close(true);
+      })
+      .catch((error) => {
+        this.handler.reqError(error, db);
+      });
+    }
+
+    if (this.data.type === 'edit') {
+
+
+    }
+
+  }
+
+  save(form, values, db) {
+
+    console.log('values', values);
+
+    if (this.data.type === 'add') {
       if (this.file.name !== '') {
         this.uploadFileApi(values, db);
       }
-
     }
 
     if (this.data.type === 'edit') {
@@ -259,14 +302,39 @@ export class AddComponent implements OnInit {
           })
           .catch((error) => {
             this.handler.reqError(error, 'delete image');
-          })
+          });
       } else {
         values.imageUrl = this.data.data.imageUrl;
         this.add(values);
       }
     }
+  }
+
+  findCategoryId(category) {
+    console.log('all categories', this.data.data.categories);
+    this.data.data.categories.forEach((item, i) => {
+      console.log('item', item);
+
+      if (category === item.name) {
+        console.log(' Matched Category ', category);
+        console.log(' Matched Category Index', i);
+        this.categoryId = item._id;
+      }
+    });
+  }
 
 
+  findCategoryName(id) {
+    console.log('_id', id);
+
+    const index = this.data.data.categories.forEach((item, i) => {
+      console.log('item ', item);
+      if (item._id === id) {
+        console.log(' Matched Category ', id);
+        console.log(' Matched Category Index', i);
+        this.categoryName = item.name;
+      }
+    });
   }
 
   fileUrl(values, db) {
@@ -286,13 +354,10 @@ export class AddComponent implements OnInit {
   }
 
   uploadFileApi(values, db) {
-
     this.upload.uploadFile(this.file, values.name.toLowerCase(), db)
       .then((response) => {
-
         this.handler.reqSuccess(response, 'save');
-        if (response["state"] === "success") {
-
+        if (response['state'] === 'success') {
           this.fileUrl(values, db);
         }
       }, error => {
@@ -303,9 +368,7 @@ export class AddComponent implements OnInit {
 
   uploadFile(event) {
     this.file = event.target.files[0];
-
     console.log('uploading file', this.file);
   }
-
 
 }

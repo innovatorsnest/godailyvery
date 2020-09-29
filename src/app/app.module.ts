@@ -23,6 +23,8 @@ import { AngularFireModule } from '@angular/fire';
 import { environment } from 'src/environments/environment';
 import { StoresComponent } from './modules/stores/stores.component';
 import { AngularFireStorageModule , BUCKET } from '@angular/fire/storage';
+import { ProductsComponent } from './modules/products/products.component';
+import { StoresDetailsComponent } from './modules/stores-details/stores-details.component';
 
 const CONFIG = {
   apiKey: "AIzaSyCLqTYsblJGrCy88zcwMEgqo0gH2ipk2BI",
@@ -41,7 +43,9 @@ const CONFIG = {
     SidenavComponent,
     CategoriesComponent,
     AddComponent,
-    StoresComponent
+    StoresComponent,
+    ProductsComponent,
+    StoresDetailsComponent
   ],
   imports: [
     BrowserModule,
