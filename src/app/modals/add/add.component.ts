@@ -5,10 +5,11 @@ import { DataService } from './../../services/data.service';
 
 import { FormControl, FormGroup, FormBuilder, Validators } from '@angular/forms';
 
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, TestabilityRegistry } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 import { AngularFireStorage } from '@angular/fire/storage';
 import { ObservableService } from 'src/app/services/observable.service';
+
 
 
 /** @title Input with a custom ErrorStateMatcher */
@@ -19,11 +20,14 @@ import { ObservableService } from 'src/app/services/observable.service';
 })
 export class AddComponent implements OnInit {
 
+
   categoryForm: FormGroup
   storeForm: FormGroup
+  categoriesForm: FormGroup
   category: any;
   storeName: any;
   file: any;
+  tiles = [];
   categories: any[];
   categoryId: any;
   categoryName: any;
@@ -47,7 +51,6 @@ export class AddComponent implements OnInit {
 
   ngOnInit() {
     this.observable.updateSpinnerStatus(false);
-
   }
 
 
@@ -69,9 +72,30 @@ export class AddComponent implements OnInit {
       console.log('building product form');
       this.buildProductForm();
     }
+
+    if (this.data.from === 'add-tiles') {
+
+      if (!this.data.data.tiles) {
+        this.data.data["tiles"] = [];
+      } else {
+        this.tiles = this.data.data.tiles;
+      }
+
+      this.buildCategoriesForm();
+
+      console.log('data here', this.data.data);
+    }
+  }
+
+  buildCategoriesForm() {
+    this.categoriesForm = this.formBuilder.group({
+      name: ['', Validators.required]
+    });
   }
 
   buildProductForm() {
+
+    console.log('tiles', this.data.tiles);
     if (this.data.type === 'add') {
 
       this.productForm = this.formBuilder.group({
@@ -194,7 +218,8 @@ export class AddComponent implements OnInit {
           phone: data.phone,
           categoryId: this.categoryId,
           state: data.state,
-          city: data.city
+          city: data.city,
+          tiles: []
         };
 
         this.storeName = data.name;
@@ -262,27 +287,35 @@ export class AddComponent implements OnInit {
   }
 
   saveProducts(payload, db) {
+    console.log('payload', payload);
+    console.log('data', this.data.data);
     if (this.data.type === 'add') {
-
       this.data.data.push(payload);
       this.dataService.addItemToStore(this.data.data, 'stores', this.data.key)
-      .then((response) => {
-              this.dialogRef.close(true);
-      })
-      .catch((error) => {
-        this.handler.reqError(error, db);
-      });
+        .then((response) => {
+          this.dialogRef.close(true);
+        })
+        .catch((error) => {
+          this.handler.reqError(error, db);
+        });
     }
 
     if (this.data.type === 'edit') {
-
-
+      console.log('%c payload of the edit ', 'color: yellow', payload)
+      this.data.products[this.data.index] = payload;
+      console.log('data inside the products', this.data.products);
+      this.dataService.updateProductsOfStore('stores', this.data.key, this.data.products)
+        .subscribe((response) => {
+          this.dialogRef.close(true);
+          this.handler.reqSuccess(response, 'Edit products');
+        }, error => {
+          this.handler.reqError(error, 'Edit products');
+        });
     }
 
   }
 
   save(form, values, db) {
-
     console.log('values', values);
 
     if (this.data.type === 'add') {
@@ -347,7 +380,6 @@ export class AddComponent implements OnInit {
         console.log('updating the new file url', values);
         this.add(values);
       }
-
     }, error => {
       this.handler.reqError(error, 'getting file url');
     });
@@ -360,15 +392,42 @@ export class AddComponent implements OnInit {
         if (response['state'] === 'success') {
           this.fileUrl(values, db);
         }
-      }, error => {
-        this.handler.reqError(error, 'save image');
-        console.log('%c error while saving the image', 'color: yellow', error);
-      });
+      },
+        error => {
+          this.handler.reqError(error, 'save image');
+          console.log('%c error while saving the image', 'color: yellow', error);
+        });
   }
 
   uploadFile(event) {
     this.file = event.target.files[0];
     console.log('uploading file', this.file);
+  }
+
+
+  tileOperation(type, values, index) {
+
+    if (type === 'add') {
+      console.log('values', values);
+      this.tiles.push(values.name);
+      this.categoriesForm.reset();
+    }
+
+    if (type === 'save') {
+      this.dataService.addTileToStore('stores', this.data.key, this.tiles)
+        .subscribe((response) => {
+          this.handler.reqSuccess(response, 'Add Stores Save');
+          this.categoriesForm.reset();
+          this.dialogRef.close(true);
+        },
+          error => {
+            this.handler.reqError(error, 'Error While Stores');
+          });
+    }
+
+    if (type === 'delete') {
+      this.tiles.splice(index, 1);
+    }
   }
 
 }

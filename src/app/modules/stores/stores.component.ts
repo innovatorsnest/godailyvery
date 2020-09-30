@@ -113,7 +113,6 @@ export class StoresComponent implements OnInit {
 
   goToStoresProducts(store) {
     console.log('store', store);
-
     this.router.navigate([`store/${store._id}`]);
   }
 

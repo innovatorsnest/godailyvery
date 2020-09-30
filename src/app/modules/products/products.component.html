@@ -5,8 +5,14 @@
         <span class="material-icons">
           add_circle_outline
         </span>
-
         Add new Product
+      </button>
+
+      <button mat-raised-button class="add--button" color="primary" (click)="addCategories()">
+        <span class="material-icons">
+          add_circle_outline
+        </span>
+        Categories
       </button>
     </div>
   </div>
@@ -29,16 +35,15 @@
             <mat-icon>more_vert</mat-icon>
           </button>
           <mat-menu #menu="matMenu">
-            <button mat-menu-item (click)="operation('edit', product)">
+            <button mat-menu-item (click)="operation('edit', product, index)">
               <mat-icon>create</mat-icon>
               <span>Edit</span>
             </button>
-            <button mat-menu-item (click)="operation('delete', product
+            <button mat-menu-item (click)="operation('delete', product, index
             )">
               <mat-icon>delete</mat-icon>
               <span>Delete</span>
             </button>
-
           </mat-menu>
         </div>
       </div>
@@ -55,3 +60,4 @@
 
 
 </div>
+

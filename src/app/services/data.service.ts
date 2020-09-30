@@ -14,7 +14,7 @@ export class DataService {
     public database: AngularFireDatabase,
     public uploadService: UploadService,
 
-  ) {    }
+  ) { }
 
 
 
@@ -27,19 +27,52 @@ export class DataService {
   }
 
 
-  addItemToStore(payload,parentdb,key) {
+  addItemToStore(payload, parentdb, key) {
     return this.database.list(parentdb).update(key, {
       products: payload
     });
   }
 
+  updateProductsOfStore(db, key, productsArray) {
 
-  getProductsOfStore(db,key) {
-    const data =  this.database.list(db, ref => {
+    const data = this.database.list(db, ref => {
+      return ref.orderByKey().equalTo(key)
+    });
+
+    data.update(key, {
+      products: productsArray
+    });
+
+    return data.valueChanges();
+  }
+
+
+  getProductsOfStore(db, key) {
+    const data = this.database.list(db, ref => {
       return ref.orderByKey().equalTo(key);
-    })
+    });
 
     console.log('%c data of all the stores inside the category', 'color: yellow', data);
+    return data.valueChanges();
+  }
+
+  getSpecificStore(db,key) {
+    const data = this.database.list(db, ref => {
+      return ref.orderByKey().equalTo(key);
+    });
+
+    return data.valueChanges();
+  }
+
+  addTileToStore(db, key, tiles) {
+    const data = this.database.list(db, ref => {
+      return ref.orderByKey().equalTo(key);
+    });
+
+    data.update(key, {
+      tiles: tiles
+    });
+
     return data.valueChanges();
   }
 
@@ -48,7 +81,7 @@ export class DataService {
     return this.database.list(db).valueChanges();
   }
 
-  updateItem(payload,db,key) {
+  updateItem(payload, db, key) {
     return this.database.list(db).update(key, payload);
   }
 
@@ -56,12 +89,12 @@ export class DataService {
     return this.uploadService.deleteFile(imageUrl);
   }
 
-  deleteItem(key,db) {
+  deleteItem(key, db) {
 
-   return this.database.list(db).remove(key);
+    return this.database.list(db).remove(key);
   }
 
-  addkey(key,db) {
+  addkey(key, db) {
     this.database.list(db).update(key, {
       _id: key
     });

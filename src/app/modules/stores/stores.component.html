@@ -16,13 +16,12 @@
 
 <div class="row items">
   <ng-container *ngFor="let store of stores; let index = index;">
-    <mat-card  (click)="goToStoresProducts(store)" class="card">
+    <mat-card class="card">
       <div class="row">
         <div class="col-md-8">
           <p class="items__title">
             {{store["name"]}}
           </p>
-
         </div>
         <div class="col-md-4">
           <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu">
@@ -42,7 +41,7 @@
         </div>
       </div>
 
-      <div class="img">
+      <div class="img" (click)="goToStoresProducts(store)">
         <img height="100" width="100" [src]="store.imageUrl" alt="">
       </div>
 
