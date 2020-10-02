@@ -25,6 +25,8 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {DragDropModule} from '@angular/cdk/drag-drop';
+import {MatSlideToggleModule} from '@angular/material/slide-toggle';
+
 
 @NgModule({
   imports: [
@@ -61,7 +63,8 @@ import {DragDropModule} from '@angular/cdk/drag-drop';
     MatToolbarModule,
     MatSidenavModule,
     MatListModule,
-    DragDropModule
+    DragDropModule,
+    MatSlideToggleModule
   ],
   exports: [
     MatButtonModule,
@@ -99,7 +102,8 @@ import {DragDropModule} from '@angular/cdk/drag-drop';
     MatToolbarModule,
     MatSidenavModule,
     MatListModule,
-    DragDropModule
+    DragDropModule,
+    MatSlideToggleModule
   ]
 })
 export class MaterialModule {

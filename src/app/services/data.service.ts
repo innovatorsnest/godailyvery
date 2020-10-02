@@ -33,6 +33,14 @@ export class DataService {
     });
   }
 
+  updateStoreOnlineStatus(db, key, status) {
+    const data = this.database.list(db).update(key, {
+      storeStatus: status
+    })
+
+    return data;
+  }
+
   updateProductsOfStore(db, key, productsArray) {
 
     const data = this.database.list(db, ref => {
@@ -56,7 +64,7 @@ export class DataService {
     return data.valueChanges();
   }
 
-  getSpecificStore(db,key) {
+  getSpecificStore(db, key) {
     const data = this.database.list(db, ref => {
       return ref.orderByKey().equalTo(key);
     });

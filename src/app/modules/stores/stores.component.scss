@@ -11,14 +11,14 @@ mat-card {
 }
 
 
-.card {
-  cursor: pointer;
-}
-
 .items {
   &__title {
     padding-top: 10px;
     padding-bottom: 10px;
     text-transform: uppercase;
   }
+}
+
+.store_image {
+  cursor: pointer;
 }

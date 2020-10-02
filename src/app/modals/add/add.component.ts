@@ -154,6 +154,7 @@ export class AddComponent implements OnInit {
 
   buildStoreForm() {
     this.category = null;
+
     if (this.data.type === 'add') {
 
       this.storeForm = this.formBuilder.group({
@@ -164,6 +165,8 @@ export class AddComponent implements OnInit {
         category: [null, Validators.required],
         state: ['', Validators.required],
         owner: ['', Validators.required],
+        from: ['', Validators.required],
+        to: ['', Validators.required],
         phone: ['', Validators.required]
       });
 
@@ -184,6 +187,8 @@ export class AddComponent implements OnInit {
           category: [this.categoryName, Validators.required],
           state: [data.state, Validators.required],
           city: [data.city, Validators.required],
+          from: [data.from, Validators.required],
+          to: [data.to, Validators.required],
           owner: [data.owner, Validators.required],
           phone: [data.phone, Validators.required]
         });
@@ -219,6 +224,9 @@ export class AddComponent implements OnInit {
           categoryId: this.categoryId,
           state: data.state,
           city: data.city,
+          from: data.from,
+          to: data.to,
+          storeStatus: true,
           tiles: []
         };
 
@@ -317,6 +325,7 @@ export class AddComponent implements OnInit {
 
   save(form, values, db) {
     console.log('values', values);
+    console.log('data type', this.data);
 
     if (this.data.type === 'add') {
       if (this.file.name !== '') {

@@ -8,6 +8,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { AddComponent } from 'src/app/modals/add/add.component';
 import { AngularFireStorage } from '@angular/fire/storage';
 import { Router } from '@angular/router';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+
 
 
 @Component({
@@ -17,6 +19,7 @@ import { Router } from '@angular/router';
 })
 export class StoresComponent implements OnInit {
 
+  storeForm: FormGroup;
   stores: any;
   categories: unknown[];
 
@@ -28,7 +31,12 @@ export class StoresComponent implements OnInit {
     private handler: ErrorHandlingService,
     private observable: ObservableService,
     private router: Router,
+    private formBuilder: FormBuilder
   ) {
+
+    this.storeForm = formBuilder.group({
+      storeStatus: ''
+    });
 
   }
 
@@ -116,5 +124,18 @@ export class StoresComponent implements OnInit {
     this.router.navigate([`store/${store._id}`]);
   }
 
+
+  updateStoreStatus(values,store) {
+    console.log(values);
+
+    this.dataService.updateStoreOnlineStatus('stores', store._id , values.storeStatus, )
+    .then((response) => {
+      this.handler.reqSuccess(response, 'Update Store Status');
+      this.getAllStores();
+    }, error => {
+      this.handler.reqError(error, 'Update Store Status');
+    })
+
+  }
 
 }

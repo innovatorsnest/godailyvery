@@ -25,6 +25,7 @@ import { StoresComponent } from './modules/stores/stores.component';
 import { AngularFireStorageModule , BUCKET } from '@angular/fire/storage';
 import { ProductsComponent } from './modules/products/products.component';
 import { StoresDetailsComponent } from './modules/stores-details/stores-details.component';
+import {NgxMaterialTimepickerModule} from 'ngx-material-timepicker';
 
 const CONFIG = {
   apiKey: "AIzaSyCLqTYsblJGrCy88zcwMEgqo0gH2ipk2BI",
@@ -58,6 +59,7 @@ const CONFIG = {
     AngularFireModule.initializeApp(CONFIG),
     AngularFireStorageModule,
     AngularFireDatabaseModule,
+    NgxMaterialTimepickerModule
 
   ],
   entryComponents: [AddComponent],

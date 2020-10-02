@@ -12,8 +12,6 @@
   </div>
 </div>
 
-
-
 <div class="row items">
   <ng-container *ngFor="let store of stores; let index = index;">
     <mat-card class="card">
@@ -41,8 +39,18 @@
         </div>
       </div>
 
-      <div class="img" (click)="goToStoresProducts(store)">
-        <img height="100" width="100" [src]="store.imageUrl" alt="">
+      <div class="img">
+        <div class="row">
+          <div class="col-md-6">
+            <img (click)="goToStoresProducts(store)" class="store_image" height="100" width="100" [src]="store.imageUrl" alt="">
+          </div>
+          <div class="col-md-4">
+            <form class="example-form" [formGroup]="storeForm" ngNativeValidate>
+              <mat-slide-toggle formControlName="storeStatus" [(ngModel)]="store.storeStatus" (change)="updateStoreStatus(storeForm.value,store)">
+              </mat-slide-toggle>
+            </form>
+          </div>
+        </div>
       </div>
 
     </mat-card>

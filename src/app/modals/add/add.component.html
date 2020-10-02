@@ -37,7 +37,14 @@
       <input type="text" name="" formControlName="state" placeholder="Your store city" class="form-control" id="">
       <label for="name">Address</label> <br>
       <textarea height="300" width="300" formControlName="address" placeholder="Enter full address"></textarea> <br>
+
+      <label for="From">From</label>
+      <input type="time" formControlName="from">
+      <label for="To">To</label>
+      <input type="time" formControlName="to"> <br>
+
       <input type="file" (change)="uploadFile($event)" formControlName="imageUrl">
+
       <button class="btn btn-primary" [disabled]="!storeForm.valid">Save</button>
     </div>
   </form>
