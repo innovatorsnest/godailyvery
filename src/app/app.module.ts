@@ -19,12 +19,6 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { AddComponent } from './modals/add/add.component';
-<<<<<<< HEAD
-import { AngularFireDatabaseModule } from '@angular/fire/database';
-import { AngularFireModule } from '@angular/fire';
-import {environment} from './../environments/environment';
-
-=======
 import { AngularFireModule } from '@angular/fire';
 import { environment } from 'src/environments/environment';
 import { StoresComponent } from './modules/stores/stores.component';
@@ -43,7 +37,6 @@ const CONFIG = {
   appId: "1:539883691020:web:cffecd62c81a35b709e229",
   measurementId: "G-FTGQ91LRD2",
 }
->>>>>>> 55c700bea2a7d9d4b42e824208c1319b68c40656
 
 @NgModule({
   declarations: [
@@ -63,16 +56,10 @@ const CONFIG = {
     MaterialModule,
     FormsModule,
     ReactiveFormsModule,
-<<<<<<< HEAD
-    AngularFireDatabaseModule,
-    AngularFireModule.initializeApp(environment.FIREBASE_CONFIG)
-
-=======
     AngularFireModule.initializeApp(CONFIG),
     AngularFireStorageModule,
     AngularFireDatabaseModule,
     NgxMaterialTimepickerModule
->>>>>>> 55c700bea2a7d9d4b42e824208c1319b68c40656
 
   ],
   entryComponents: [AddComponent],
