@@ -1,48 +1,111 @@
-import { Injectable, OnInit } from '@angular/core';
+import { UploadService } from './upload.service';
+import { Injectable } from '@angular/core';
 import { AngularFireDatabase } from '@angular/fire/database';
+
 
 @Injectable({
   providedIn: 'root'
 })
-export class DataService implements OnInit {
+export class DataService {
+
 
   db: any;
   constructor(
-    public database: AngularFireDatabase
-  ) {
+    public database: AngularFireDatabase,
+    public uploadService: UploadService,
 
+  ) { }
+
+
+
+
+
+  addItem(payload, db) {
+
+    return this.database.list(db).push(payload);
 
   }
 
-  ngOnInit() {
 
+  addItemToStore(payload, parentdb, key) {
+    return this.database.list(parentdb).update(key, {
+      products: payload
+    });
   }
 
-  addCategory(name) {
-    // this.db.push({
-    //   name: name
-    // });
-    console.log('name', name)
-    this.db.push({
-      name: name
+  updateStoreOnlineStatus(db, key, status) {
+    const data = this.database.list(db).update(key, {
+      storeStatus: status
     })
-    // this.database.list("categories").push({
-    //   name: name
-    // });
+
+    return data;
+  }
+
+  updateProductsOfStore(db, key, productsArray) {
+
+    const data = this.database.list(db, ref => {
+      return ref.orderByKey().equalTo(key)
+    });
+
+    data.update(key, {
+      products: productsArray
+    });
+
+    return data.valueChanges();
   }
 
 
-  getAllCategories() {
+  getProductsOfStore(db, key) {
+    const data = this.database.list(db, ref => {
+      return ref.orderByKey().equalTo(key);
+    });
 
+    console.log('%c data of all the stores inside the category', 'color: yellow', data);
+    return data.valueChanges();
   }
 
-  updateCategory() {
+  getSpecificStore(db, key) {
+    const data = this.database.list(db, ref => {
+      return ref.orderByKey().equalTo(key);
+    });
 
+    return data.valueChanges();
+  }
+
+  addTileToStore(db, key, tiles) {
+    const data = this.database.list(db, ref => {
+      return ref.orderByKey().equalTo(key);
+    });
+
+    data.update(key, {
+      tiles: tiles
+    });
+
+    return data.valueChanges();
   }
 
 
-  deleteCategory() {
+  getItems(db) {
+    return this.database.list(db).valueChanges();
+  }
 
+  updateItem(payload, db, key) {
+    return this.database.list(db).update(key, payload);
+  }
+
+  deleteImage(imageUrl) {
+    return this.uploadService.deleteFile(imageUrl);
+  }
+
+  deleteItem(key, db) {
+
+    return this.database.list(db).remove(key);
+  }
+
+  addkey(key, db) {
+    this.database.list(db).update(key, {
+      _id: key
+    });
   }
 }
 

@@ -1,0 +1,94 @@
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <button mat-raised-button class="add--button" color="primary" (click)="addNewStore()">
+        <span class="material-icons">
+          add_circle_outline
+        </span>
+
+        Add new Store
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="row items">
+
+  <mat-list>
+    <mat-list-item *ngFor="let store of stores; let index = index;">
+      <img matListAvatar [src]="store.imageUrl" alt="..."  class="store_image" (click)="goToStoresProducts(store)">
+      <h3 matLine> {{store.name}} </h3>
+      <form class="example-form" [formGroup]="storeForm" ngNativeValidate>
+        <mat-slide-toggle formControlName="storeStatus" [(ngModel)]="store.storeStatus"
+          (change)="updateStoreStatus(storeForm.value,store)">
+        </mat-slide-toggle>
+      </form>
+
+      <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu">
+        <mat-icon>more_vert</mat-icon>
+      </button>
+
+
+      <mat-menu #menu="matMenu">
+        <button mat-menu-item (click)="operation('edit', store)">
+          <mat-icon>create</mat-icon>
+          <span>Edit</span>
+        </button>
+        <button mat-menu-item (click)="operation('delete', store)">
+          <mat-icon>delete</mat-icon>
+          <span>Delete</span>
+        </button>
+
+      </mat-menu>
+    </mat-list-item>
+  </mat-list>
+
+  <!-- <ng-container *ngFor="let store of stores; let index = index;">
+    <mat-card class="card">
+      <div class="row">
+        <div class="col-md-8">
+          <p class="items__title">
+            {{store["name"]}}
+          </p>
+        </div>
+        <div class="col-md-4">
+          <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu">
+            <mat-icon>more_vert</mat-icon>
+          </button>
+          <mat-menu #menu="matMenu">
+            <button mat-menu-item (click)="operation('edit', store)">
+              <mat-icon>create</mat-icon>
+              <span>Edit</span>
+            </button>
+            <button mat-menu-item (click)="operation('delete', store)">
+              <mat-icon>delete</mat-icon>
+              <span>Delete</span>
+            </button>
+
+          </mat-menu>
+        </div>
+      </div>
+
+      <div class="img">
+        <div class="row">
+          <div class="col-md-6">
+            <img (click)="goToStoresProducts(store)" class="store_image" height="100" width="100" [src]="store.imageUrl" alt="">
+          </div>
+          <div class="col-md-4">
+            <form class="example-form" [formGroup]="storeForm" ngNativeValidate>
+              <mat-slide-toggle formControlName="storeStatus" [(ngModel)]="store.storeStatus" (change)="updateStoreStatus(storeForm.value,store)">
+              </mat-slide-toggle>
+            </form>
+          </div>
+        </div>
+      </div>
+
+    </mat-card>
+
+
+
+  </ng-container> -->
+
+
+
+</div>
