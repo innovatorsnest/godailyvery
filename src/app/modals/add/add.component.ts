@@ -262,6 +262,7 @@ export class AddComponent implements OnInit {
           this.handler.reqSuccess(response, 'add category');
           if (response['key']) {
             this.dataService.addkey(response['key'], db);
+            this.observable.updateSpinnerStatus(false);
             this.dialogRef.close(true);
           }
         })
@@ -286,7 +287,7 @@ export class AddComponent implements OnInit {
       this.dataService.updateItem(newPayload.data, db, newPayload._id)
         .then((response) => {
           this.handler.reqSuccess(response, `update ${db}`);
-          // this.observable.updateSpinnerStatus(false);
+          this.observable.updateSpinnerStatus(false);
           this.dialogRef.close(true);
         }).catch((error) => {
           this.handler.reqError(error, `update ${db}`);
@@ -301,6 +302,7 @@ export class AddComponent implements OnInit {
       this.data.data.push(payload);
       this.dataService.addItemToStore(this.data.data, 'stores', this.data.key)
         .then((response) => {
+          this.observable.updateSpinnerStatus(false);
           this.dialogRef.close(true);
         })
         .catch((error) => {
@@ -314,6 +316,7 @@ export class AddComponent implements OnInit {
       console.log('data inside the products', this.data.products);
       this.dataService.updateProductsOfStore('stores', this.data.key, this.data.products)
         .subscribe((response) => {
+          this.observable.updateSpinnerStatus(false);
           this.dialogRef.close(true);
           this.handler.reqSuccess(response, 'Edit products');
         }, error => {
@@ -326,6 +329,9 @@ export class AddComponent implements OnInit {
   save(form, values, db) {
     console.log('values', values);
     console.log('data type', this.data);
+
+    this.observable.updateSpinnerStatus(true);
+
 
     if (this.data.type === 'add') {
       if (this.file.name !== '') {

@@ -1,6 +1,10 @@
 <div class="container">
   <div class="row">
+
     <div class="col-md-12">
+      <span class="store_name">
+        {{store.name}}
+      </span>
       <button mat-raised-button class="add--button" color="primary" (click)="addNewProduct()">
         <span class="material-icons">
           add_circle_outline
@@ -18,46 +22,28 @@
   </div>
 </div>
 
+<mat-list>
+  <mat-list-item *ngFor="let product of products; let index = index;">
+    <img matListAvatar [src]="product.imageUrl" alt="...">
+    <h3 matLine> {{product.name}} </h3>
+    <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu">
+      <mat-icon>more_vert</mat-icon>
+    </button>
+
+    <mat-menu #menu="matMenu">
+      <button mat-menu-item (click)="operation('edit', product, index)">
+        <mat-icon>create</mat-icon>
+        <span>Edit</span>
+      </button>
+      <button mat-menu-item (click)="operation('delete', product, index
+      )">
+        <mat-icon>delete</mat-icon>
+        <span>Delete</span>
+      </button>
+
+    </mat-menu>
+  </mat-list-item>
+</mat-list>
 
 
-<div class="row items">
-  <ng-container *ngFor="let product of products; let index = index;">
-    <mat-card class="items-card">
-      <div class="row">
-        <div class="col-md-8">
-          <p class="items__title">
-            {{product["name"]}}
-          </p>
-
-        </div>
-        <div class="col-md-4">
-          <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu">
-            <mat-icon>more_vert</mat-icon>
-          </button>
-          <mat-menu #menu="matMenu">
-            <button mat-menu-item (click)="operation('edit', product, index)">
-              <mat-icon>create</mat-icon>
-              <span>Edit</span>
-            </button>
-            <button mat-menu-item (click)="operation('delete', product, index
-            )">
-              <mat-icon>delete</mat-icon>
-              <span>Delete</span>
-            </button>
-          </mat-menu>
-        </div>
-      </div>
-      <div class="img">
-        <img height="100" width="100" [src]="product.imageUrl" alt="">
-
-      </div>
-
-    </mat-card>
-
-
-  </ng-container>
-
-
-
-</div>
 
