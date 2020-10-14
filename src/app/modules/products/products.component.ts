@@ -73,7 +73,8 @@ export class ProductsComponent implements OnInit {
       from: 'products',
       data: this.products || [],
       key: this.key,
-      tiles: this.tiles
+      tiles: this.tiles,
+      store: this.store
     };
 
     this.openModel(payload, AddComponent, '400', '400');
@@ -95,21 +96,27 @@ export class ProductsComponent implements OnInit {
         products: this.products,
         index: index,
         tiles: this.tiles,
-        key: this.key
+        key: this.key,
+        store: this.store
       };
 
-      this.openModel(payload, AddComponent, '500' , '400');
+      this.openModel(payload, AddComponent, '500', '400');
     }
 
     if (type === 'delete') {
-      this.dataService.deleteImage(item.imageUrl)
-        .then((response) => {
-          this.handler.reqSuccess(response, 'delete image');
-          this.removeProductFromProducts(index);
-        })
-        .catch((error) => {
-          this.handler.reqError(error, 'delete image');
-        })
+      if (item.imageUrl === '') {
+        this.removeProductFromProducts(index);
+      } else {
+        this.dataService.deleteImage(item.imageUrl)
+          .then((response) => {
+            this.handler.reqSuccess(response, 'delete image');
+            this.removeProductFromProducts(index);
+          })
+          .catch((error) => {
+            this.handler.reqError(error, 'delete image');
+          })
+      }
+
     }
   }
 
@@ -117,15 +124,15 @@ export class ProductsComponent implements OnInit {
     this.products.splice(index, 1);
     console.log('remaining products after splicing', this.products);
     this.dataService.updateProductsOfStore('stores', this.key, this.products)
-    .subscribe((response) => {
-      this.errorHandling.reqSuccess(response, 'Remove Product');
-    }, error => {
-      this.errorHandling.reqError(error, 'Error Product');
-    });
+      .subscribe((response) => {
+        this.errorHandling.reqSuccess(response, 'Remove Product');
+      }, error => {
+        this.errorHandling.reqError(error, 'Error Product');
+      });
   }
 
 
-  openModel(payload, component, h , w) {
+  openModel(payload, component, h, w) {
     this.modalService.openDialog(payload, component, { height: h, width: w }, (callback) => {
       console.log('response from the add response', callback);
       if (callback === true) {

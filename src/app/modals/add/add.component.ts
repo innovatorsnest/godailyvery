@@ -26,7 +26,9 @@ export class AddComponent implements OnInit {
   categoriesForm: FormGroup
   category: any;
   storeName: any;
-  file: any;
+  file = {
+    name: ''
+  }
   tiles = [];
   categories: any[];
   categoryId: any;
@@ -52,10 +54,6 @@ export class AddComponent implements OnInit {
   ngOnInit() {
     this.observable.updateSpinnerStatus(false);
   }
-
-
-
-
 
   buildForm() {
 
@@ -100,10 +98,10 @@ export class AddComponent implements OnInit {
 
       this.productForm = this.formBuilder.group({
         name: ['', Validators.required],
-        imageUrl: ['', Validators.required],
+        imageUrl: [''],
         type: [null, Validators.required],
         price: ['', Validators.required],
-        description: ['', Validators.required]
+        description: ['']
       });
 
       console.log('model data', this.data);
@@ -120,7 +118,7 @@ export class AddComponent implements OnInit {
         imageUrl: [''],
         type: [data.type, Validators.required],
         price: [data.price, Validators.required],
-        description: [data.description, Validators.required]
+        description: [data.description]
       });
 
       console.log('model data', this.data);
@@ -206,6 +204,7 @@ export class AddComponent implements OnInit {
       };
 
       this.saveDetails(payload, 'categories');
+
     }
 
     if (this.data.from === 'stores') {
@@ -240,9 +239,9 @@ export class AddComponent implements OnInit {
       const payload = {
         name: data.name,
         price: data.price,
-        description: data.description,
+        description: data.description || '',
         type: data.type,
-        imageUrl: data.imageUrl,
+        imageUrl: data.imageUrl || '',
         inStock: true
       };
 
@@ -332,18 +331,22 @@ export class AddComponent implements OnInit {
 
     this.observable.updateSpinnerStatus(true);
 
+    console.log('file name', this.file);
 
     if (this.data.type === 'add') {
       if (this.file.name !== '') {
         this.uploadFileApi(values, db);
+      } else {
+        this.add(values);
       }
     }
 
     if (this.data.type === 'edit') {
 
+      console.log('data inside the edit', this.file);
       const previousData = { ...this.data.data };
 
-      if (this.file) {
+      if (this.file.name !== '') {
         this.dataService.deleteImage(this.data.data.imageUrl)
           .then((res) => {
             this.uploadFileApi(values, db);
@@ -400,19 +403,52 @@ export class AddComponent implements OnInit {
     });
   }
 
-  uploadFileApi(values, db) {
-    this.upload.uploadFile(this.file, values.name.toLowerCase(), db)
-      .then((response) => {
-        this.handler.reqSuccess(response, 'save');
-        if (response['state'] === 'success') {
-          this.fileUrl(values, db);
-        }
-      },
-        error => {
-          this.handler.reqError(error, 'save image');
-          console.log('%c error while saving the image', 'color: yellow', error);
-        });
+  getProductFileUrl(values,db) {
+    console.log('getting the file url of the new data', values);
+    this.upload.getProductFileUrl(db, this.data.store.name ,values.name.toLowerCase()).subscribe((response) => {
+      this.handler.reqSuccess(response, 'getting file url');
+      console.log('previous file url values', values);
+      if (response) {
+        values.imageUrl = response;
+        console.log('updating the new file url', values);
+        this.add(values);
+      }
+    }, error => {
+      this.handler.reqError(error, 'getting file url');
+    });
   }
+
+  uploadFileApi(values, db) {
+    console.log('data inside the upload file api', this.data);
+    if (this.data.from === 'products') {
+      console.log('data inside the products');
+      this.upload.uploadProductsFile(this.file,values.name.toLowerCase(),db, this.data.store.name)
+        .then((response) => {
+          this.handler.reqSuccess(response, 'save');
+          if (response['state'] === 'success') {
+            this.getProductFileUrl(values, db);
+          }
+        },
+          error => {
+            this.handler.reqError(error, 'save image');
+            console.log('%c error while saving the image', 'color: yellow', error);
+          });
+    } else {
+      console.log('data inside the not products');
+      this.upload.uploadFile(this.file,values.name.toLowerCase(), db)
+        .then((response) => {
+          this.handler.reqSuccess(response, 'save');
+          if (response['state'] === 'success') {
+            this.fileUrl(values, db);
+          }
+        },
+          error => {
+            this.handler.reqError(error, 'save image');
+            console.log('%c error while saving the image', 'color: yellow', error);
+          });
+    }
+  }
+
 
   uploadFile(event) {
     this.file = event.target.files[0];

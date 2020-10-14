@@ -3,8 +3,6 @@ import { Observable } from 'rxjs';
 import { finalize, takeLast } from 'rxjs/operators';
 import { AngularFireStorage } from '@angular/fire/storage';
 
-
-
 @Injectable({
   providedIn: 'root'
 })
@@ -19,7 +17,7 @@ export class UploadService {
   ) { }
 
 
-  uploadFile(image,name, folder) {
+  uploadFile(image, name, folder) {
     const file = image;
     const filePath = `${folder}/${name}`;
     const fileRef = this.storage.ref(filePath);
@@ -29,17 +27,39 @@ export class UploadService {
     // this.uploadPercent = task.percentageChanges();
 
     task.snapshotChanges().pipe(
-        finalize(() => this.downloadURL = fileRef.getDownloadURL() )
-     )
-     .subscribe();
+      finalize(() => this.downloadURL = fileRef.getDownloadURL())
+    )
+      .subscribe();
 
 
 
     return task;
   }
+  uploadProductsFile(image, name, folder, store) {
+    const file = image;
+    const filePath = `${folder}/${store}/${name}`;
+    console.log('file path', filePath);
+    const fileRef = this.storage.ref(filePath);
+    const task = this.storage.upload(filePath, file);
 
-  getFileDownloadUrl(db,file) {
+    task.snapshotChanges().pipe(
+      finalize(() => this.downloadURL = fileRef.getDownloadURL())
+    )
+    .subscribe();
+
+    return task;
+  }
+
+
+
+  getFileDownloadUrl(db, file) {
     const ref = this.storage.ref(`${db}/${file}`);
+    this.profileUrl = ref.getDownloadURL();
+    return this.profileUrl;
+  }
+
+  getProductFileUrl(db,store,file) {
+    const ref = this.storage.ref(`${db}/${store}/${file}`);
     this.profileUrl = ref.getDownloadURL();
     return this.profileUrl;
   }

@@ -74,14 +74,14 @@
   <form [formGroup]="categoriesForm">
     <label for="name">Tile Name</label>
     <input type="text" formControlName="name">
-    <button class="btn btn-primary" (click)="tileOperation('add', categoriesForm.value)"
+    <button class="btn btn-primary" (click)="tileOperation('add', categoriesForm.value, null)"
       [disabled]="!categoriesForm.valid">Add</button>
-    <button class="btn btn-secondary" (click)="tileOperation('save')">Save</button>
+    <button class="btn btn-secondary" (click)="tileOperation('save', null , null)">Save</button>
   </form>
 
   <div class="tiles" *ngIf="tiles.length > 0; else noTiles">
     <div class="row tiles-panel" *ngFor="let tile of tiles; let index = index">
-      <div class="col-md-10">
+    <div class="col-md-10">
         {{tile}}
       </div>
       <div class="col-md-2">
